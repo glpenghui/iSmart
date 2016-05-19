@@ -1,13 +1,13 @@
-<%@ page pageEncoding="UTF-8" %>
+<%@ page pageEncoding="UTF-8"%>
 <html>
 <head>
-    <title>Hello</title>
+<title>Hello</title>
 </head>
 <body>
 
-<h1>Hello!</h1>
+	<h1>Hello!</h1>
 
-<h2>当前时间：${currentTime}</h2>
+	<h2>当前时间：${currentTime}</h2>
 
 </body>
 </html>

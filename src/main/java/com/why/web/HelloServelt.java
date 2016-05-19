@@ -13,7 +13,7 @@ import javax.servlet.http.HttpServletResponse;
 
 @WebServlet("/hello")
 public class HelloServelt extends HttpServlet {
-	@Override
+    @Override
     protected void doGet(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
         DateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
         String currentTime = dateFormat.format(new Date());
