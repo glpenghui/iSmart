@@ -1,11 +1,8 @@
 package com.why.service;
 
 import java.sql.Connection;
-import java.sql.PreparedStatement;
-import java.sql.ResultSet;
-import java.sql.SQLException;
-import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 
@@ -15,24 +12,11 @@ import com.why.repo.JdbcHelper;
 public class CustomerService {
     
     public List<Customer> findCustomerList(){
-        List<Customer> customers = new ArrayList<Customer>();
+        List<Customer> customers = Collections.emptyList();
         Connection conn = null;
         try {
             conn = JdbcHelper.getConnection();
-            PreparedStatement stmt = conn.prepareStatement("SELECT * FROM customer");
-            ResultSet rs = stmt.executeQuery();
-            while(rs.next()){
-                Customer customer = new Customer();
-                customer.setId(rs.getLong("id"));
-                customer.setName(rs.getString("name"));
-                customer.setContact(rs.getString("contact"));
-                customer.setTelephone(rs.getString("telephone"));
-                customer.setEmail(rs.getString("email"));
-                customer.setRemark(rs.getString("remark"));
-                customers.add(customer);
-            }
-        } catch (SQLException e) {
-            e.printStackTrace();
+            customers = JdbcHelper.queryEntityList(conn, "SELECT * FROM customer", Customer.class);
         } finally {
             JdbcHelper.closeConnection(conn);
         }

@@ -46,7 +46,7 @@ public class JdbcHelper {
     }
     
     
-    public static <T> List<T> queryEntityList(Class<T> entityClass, Connection conn, String sql, Object... params){
+    public static <T> List<T> queryEntityList(Connection conn, String sql, Class<T> entityClass, Object... params){
         List<T> entityList = Collections.emptyList();
         try {
             entityList = QUERY_RUNNER.query(conn, sql, new BeanListHandler<T>(entityClass), params);
