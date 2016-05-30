@@ -12,6 +12,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Properties;
 
+import org.apache.commons.dbcp2.BasicDataSource;
 import org.apache.commons.dbutils.QueryRunner;
 import org.apache.commons.dbutils.handlers.BeanHandler;
 import org.apache.commons.dbutils.handlers.BeanListHandler;
@@ -26,23 +27,20 @@ public class JdbcHelper {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(JdbcHelper.class);
     
-    private static final String DRIVER;
-    private static final String URL;
-    private static final String USERNAME;
-    private static final String PASSWORD;
+    private static final BasicDataSource DATA_SOURCE;
     
     static{
         Properties properties = PropertiesUtil.load("jdbc.properties");
-        DRIVER = properties.getProperty("jdbc.driver");
-        URL = properties.getProperty("jdbc.url");
-        USERNAME = properties.getProperty("jdbc.username");
-        PASSWORD = properties.getProperty("jdbc.password");
+        String driver = properties.getProperty("jdbc.driver");
+        String url = properties.getProperty("jdbc.url");
+        String username = properties.getProperty("jdbc.username");
+        String password = properties.getProperty("jdbc.password");
         
-        try {
-            Class.forName(DRIVER);
-        } catch (ClassNotFoundException e) {
-            e.printStackTrace();
-        }
+        DATA_SOURCE = new BasicDataSource();
+        DATA_SOURCE.setDriverClassName(driver);
+        DATA_SOURCE.setUrl(url);
+        DATA_SOURCE.setUsername(username);
+        DATA_SOURCE.setPassword(password);
     }
     
     private static final QueryRunner QUERY_RUNNER = new QueryRunner();
@@ -53,7 +51,7 @@ public class JdbcHelper {
         Connection conn = THREAD_CONNECTION_MAP.get();
         if(conn == null){
             try {
-                conn = DriverManager.getConnection(URL, USERNAME, PASSWORD);
+                conn = DATA_SOURCE.getConnection();
             } catch (SQLException e) {
                 e.printStackTrace();
                 LOGGER.error("getConnection error", e);
@@ -74,8 +72,6 @@ public class JdbcHelper {
             e.printStackTrace();
             LOGGER.error("queryEntity error", e);
             throw new RuntimeException(e);
-        }finally{
-            closeConnection();
         }
         return entity;
     }
@@ -89,8 +85,6 @@ public class JdbcHelper {
             e.printStackTrace();
             LOGGER.error("queryEntityList error", e);
             throw new RuntimeException(e);
-        } finally {
-            closeConnection();
         }
         return entityList;
     }
@@ -104,8 +98,6 @@ public class JdbcHelper {
             e.printStackTrace();
             LOGGER.error("executeQuery error", e);
             throw new RuntimeException(e);
-        } finally {
-            closeConnection();
         }
         return result;
     }
@@ -170,26 +162,8 @@ public class JdbcHelper {
             e.printStackTrace();
             LOGGER.error("executeUpdate error", e);
             throw new RuntimeException(e);
-        } finally {
-            closeConnection();
         }
         return rows;
-    }
-    
-    private static void closeConnection(){
-        Connection conn = THREAD_CONNECTION_MAP.get();
-        if(conn == null){
-            return;
-        }
-        try {
-            conn.close();
-        } catch (SQLException e) {
-            e.printStackTrace();
-            LOGGER.error("closeConnection error", e);
-            throw new RuntimeException(e);
-        } finally {
-            THREAD_CONNECTION_MAP.remove();
-        }
     }
 
     public static void executeSqlFile(String path) {
