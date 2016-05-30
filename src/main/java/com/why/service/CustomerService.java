@@ -1,8 +1,5 @@
 package com.why.service;
 
-import java.sql.Connection;
-import java.util.Arrays;
-import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 
@@ -12,20 +9,23 @@ import com.why.repo.JdbcHelper;
 public class CustomerService {
     
     public List<Customer> findCustomerList(){
-        List<Customer> customers = Collections.emptyList();
-        Connection conn = null;
-        try {
-            conn = JdbcHelper.getConnection();
-            customers = JdbcHelper.queryEntityList(conn, "SELECT * FROM customer", Customer.class);
-        } finally {
-            JdbcHelper.closeConnection(conn);
-        }
-        System.out.println(Arrays.toString(customers.toArray()));
-        return customers;
+        return JdbcHelper.queryEntityList("SELECT * FROM customer", Customer.class);
+    }
+    
+    public Customer findCustomer(long id){
+        return JdbcHelper.queryEntity("SELECT * FROM customer WHERE id=?", Customer.class, id);
     }
     
     public boolean createCustomer(Map<String, Object> fieldMap){
-        return false;
+        return JdbcHelper.insertEntity(fieldMap, Customer.class);
+    }
+    
+    public boolean updateCustomer(long id, Map<String, Object> fieldMap){
+        return JdbcHelper.updateEntity(id, fieldMap, Customer.class);
+    }
+    
+    public boolean deleteCustomer(long id){
+        return JdbcHelper.deleteEntity(id, Customer.class);
     }
     
 }

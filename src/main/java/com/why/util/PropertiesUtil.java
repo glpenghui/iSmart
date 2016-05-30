@@ -9,7 +9,7 @@ import org.slf4j.LoggerFactory;
 
 public class PropertiesUtil {
 
-    private static final Logger logger = LoggerFactory.getLogger(PropertiesUtil.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(PropertiesUtil.class);
     
     public static Properties load(String path){
         ClassLoader loader = Thread.currentThread().getContextClassLoader();
@@ -23,7 +23,7 @@ public class PropertiesUtil {
             properties.load(input);
         }catch(IOException e) {
             e.printStackTrace();
-            logger.error("加载"+path+"属性文件失败", e);
+            LOGGER.error("加载"+path+"属性文件失败", e);
         }finally{
             if(input != null){
                 try {
