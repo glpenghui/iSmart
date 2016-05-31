@@ -7,11 +7,17 @@ import java.util.Properties;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-public class PropertiesUtil {
+public class Property {
 
-    private static final Logger LOGGER = LoggerFactory.getLogger(PropertiesUtil.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(Property.class);
     
-    public static Properties load(String path){
+    private final Properties properties;
+    
+    public Property(String path){
+        properties = load(path);
+    }
+    
+    private Properties load(String path){
         ClassLoader loader = Thread.currentThread().getContextClassLoader();
         InputStream input = loader.getResourceAsStream(path);
         if(input == null){
@@ -34,6 +40,18 @@ public class PropertiesUtil {
             }
         }
         return properties;
+    }
+    
+    public String getStr(String key){
+        return properties.getProperty(key);
+    }
+    
+    public int getInt(String key){
+        return Integer.parseInt(getStr(key));
+    }
+    
+    public boolean getBool(String key){
+        return Boolean.valueOf(getStr(key));
     }
     
 }

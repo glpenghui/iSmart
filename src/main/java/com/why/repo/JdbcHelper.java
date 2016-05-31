@@ -5,12 +5,11 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.sql.Connection;
-import java.sql.DriverManager;
 import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
-import java.util.Properties;
+import java.util.concurrent.TimeUnit;
 
 import org.apache.commons.dbcp2.BasicDataSource;
 import org.apache.commons.dbutils.QueryRunner;
@@ -21,7 +20,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import com.why.util.CollectionUtil;
-import com.why.util.PropertiesUtil;
+import com.why.util.Property;
 
 public class JdbcHelper {
 
@@ -30,23 +29,76 @@ public class JdbcHelper {
     private static final BasicDataSource DATA_SOURCE;
     
     static{
-        Properties properties = PropertiesUtil.load("jdbc.properties");
-        String driver = properties.getProperty("jdbc.driver");
-        String url = properties.getProperty("jdbc.url");
-        String username = properties.getProperty("jdbc.username");
-        String password = properties.getProperty("jdbc.password");
+        Property property = new Property("jdbc.properties");
         
         DATA_SOURCE = new BasicDataSource();
-        DATA_SOURCE.setDriverClassName(driver);
-        DATA_SOURCE.setUrl(url);
-        DATA_SOURCE.setUsername(username);
-        DATA_SOURCE.setPassword(password);
+        DATA_SOURCE.setDriverClassName(property.getStr("jdbc.driver"));
+        DATA_SOURCE.setUrl(property.getStr("jdbc.url"));
+        DATA_SOURCE.setUsername(property.getStr("jdbc.username"));
+        DATA_SOURCE.setPassword(property.getStr("jdbc.password"));
+        
+        DATA_SOURCE.setInitialSize(property.getInt("pool.initialSize"));
+        DATA_SOURCE.setMinIdle(property.getInt("pool.minIdle"));
+        DATA_SOURCE.setMaxTotal(property.getInt("pool.maxTotal"));
+        DATA_SOURCE.setMaxWaitMillis(property.getInt("pool.maxWaitMillis"));
+        DATA_SOURCE.setTestWhileIdle(property.getBool("pool.testWhileIdle"));
+        DATA_SOURCE.setValidationQuery(property.getStr("pool.validationQuery"));
+        DATA_SOURCE.setRemoveAbandonedOnBorrow(property.getBool("pool.removeAbandonedOnBorrow"));
     }
     
     private static final QueryRunner QUERY_RUNNER = new QueryRunner();
     
     private static final ThreadLocal<Connection> THREAD_CONNECTION_MAP = new ThreadLocal<Connection>();
     
+    public static <T> T queryEntity(String sql, Class<T> entityClass, Object... params){
+        T entity;
+        Connection conn = getConnection();
+        try {
+            entity = QUERY_RUNNER.query(conn, sql, new BeanHandler<T>(entityClass), params);
+        } catch (SQLException e) {
+            e.printStackTrace();
+            LOGGER.error("queryEntity error", e);
+            throw new RuntimeException(e);
+        } finally {
+            closeConnection();
+        }
+        return entity;
+    }
+    
+    public static <T> List<T> queryEntityList(String sql, Class<T> entityClass, Object... params){
+        List<T> entityList;
+        Connection conn = getConnection();
+        try {
+            entityList = QUERY_RUNNER.query(conn, sql, new BeanListHandler<T>(entityClass), params);
+        } catch (SQLException e) {
+            e.printStackTrace();
+            LOGGER.error("queryEntityList error", e);
+            throw new RuntimeException(e);
+        } finally {
+            closeConnection();
+        }
+        return entityList;
+    }
+    
+    public static List<Map<String, Object>> executeQuery(String sql, Object... params){
+        List<Map<String, Object>> result;
+        Connection conn = getConnection();
+        try {
+            result = QUERY_RUNNER.query(conn, sql, new MapListHandler(), params);
+        } catch (SQLException e) {
+            e.printStackTrace();
+            LOGGER.error("executeQuery error", e);
+            throw new RuntimeException(e);
+        } finally {
+            closeConnection();
+        }
+        return result;
+    }
+    
+    /** 
+     * Don't need close Connection because QueryRunner close Internal<br>
+     * ThreadLocal hold Connection for per Thread and don't remove!?
+     */
     private static Connection getConnection(){
         Connection conn = THREAD_CONNECTION_MAP.get();
         if(conn == null){
@@ -63,43 +115,21 @@ public class JdbcHelper {
         return conn;
     }
     
-    public static <T> T queryEntity(String sql, Class<T> entityClass, Object... params){
-        T entity;
-        Connection conn = getConnection();
+    private static void closeConnection(){
+        Connection conn = THREAD_CONNECTION_MAP.get();
+        if(conn == null){
+            return;
+        }
+        
         try {
-            entity = QUERY_RUNNER.query(conn, sql, new BeanHandler<T>(entityClass), params);
+            conn.close(); //use datasource not close just put back to pool
         } catch (SQLException e) {
             e.printStackTrace();
-            LOGGER.error("queryEntity error", e);
+            LOGGER.error("closeConnection error", e);
             throw new RuntimeException(e);
+        } finally {
+            THREAD_CONNECTION_MAP.remove();
         }
-        return entity;
-    }
-    
-    public static <T> List<T> queryEntityList(String sql, Class<T> entityClass, Object... params){
-        List<T> entityList;
-        Connection conn = getConnection();
-        try {
-            entityList = QUERY_RUNNER.query(conn, sql, new BeanListHandler<T>(entityClass), params);
-        } catch (SQLException e) {
-            e.printStackTrace();
-            LOGGER.error("queryEntityList error", e);
-            throw new RuntimeException(e);
-        }
-        return entityList;
-    }
-    
-    public static List<Map<String, Object>> executeQuery(String sql, Object... params){
-        List<Map<String, Object>> result;
-        Connection conn = getConnection();
-        try {
-            result = QUERY_RUNNER.query(conn, sql, new MapListHandler(), params);
-        } catch (SQLException e) {
-            e.printStackTrace();
-            LOGGER.error("executeQuery error", e);
-            throw new RuntimeException(e);
-        }
-        return result;
     }
     
     public static <T> boolean insertEntity(Map<String, Object> fieldMap, Class<T> entityClass){
