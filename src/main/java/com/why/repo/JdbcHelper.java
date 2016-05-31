@@ -59,8 +59,6 @@ public class JdbcHelper {
             e.printStackTrace();
             LOGGER.error("queryEntity error", e);
             throw new RuntimeException(e);
-        } finally {
-            closeConnection();
         }
         return entity;
     }
@@ -74,8 +72,6 @@ public class JdbcHelper {
             e.printStackTrace();
             LOGGER.error("queryEntityList error", e);
             throw new RuntimeException(e);
-        } finally {
-            closeConnection();
         }
         return entityList;
     }
@@ -89,8 +85,6 @@ public class JdbcHelper {
             e.printStackTrace();
             LOGGER.error("executeQuery error", e);
             throw new RuntimeException(e);
-        } finally {
-            closeConnection();
         }
         return result;
     }
@@ -113,23 +107,6 @@ public class JdbcHelper {
             }
         }
         return conn;
-    }
-    
-    private static void closeConnection(){
-        Connection conn = THREAD_CONNECTION_MAP.get();
-        if(conn == null){
-            return;
-        }
-        
-        try {
-            conn.close(); //use datasource not close just put back to pool
-        } catch (SQLException e) {
-            e.printStackTrace();
-            LOGGER.error("closeConnection error", e);
-            throw new RuntimeException(e);
-        } finally {
-            THREAD_CONNECTION_MAP.remove();
-        }
     }
     
     public static <T> boolean insertEntity(Map<String, Object> fieldMap, Class<T> entityClass){
