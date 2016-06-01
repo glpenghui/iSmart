@@ -1,4 +1,4 @@
-package com.why.util;
+package com.why.ismart.framework.util;
 
 import java.util.Collection;
 import java.util.Map;
@@ -12,8 +12,16 @@ public class CollectionUtil {
         return CollectionUtils.isEmpty(coll);
     }
     
+    public static boolean isNotEmpty(Collection<?> coll){
+        return !isEmpty(coll);
+    }
+    
     public static boolean isEmpty(Map<?, ?> map){
         return MapUtils.isEmpty(map);
+    }
+    
+    public static boolean isNotEmpty(Map<?, ?> map){
+        return !isEmpty(map);
     }
     
 }

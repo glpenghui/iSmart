@@ -1,4 +1,4 @@
-package com.why.util;
+package com.why.ismart.framework.config;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -21,7 +21,7 @@ public class Property {
         ClassLoader loader = Thread.currentThread().getContextClassLoader();
         InputStream input = loader.getResourceAsStream(path);
         if(input == null){
-            throw new IllegalArgumentException("找不到配置文件"+path);
+            throw new IllegalArgumentException("找不到配置文件："+path);
         }
         
         Properties properties = new Properties();

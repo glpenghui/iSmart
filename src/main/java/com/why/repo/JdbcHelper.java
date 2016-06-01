@@ -9,7 +9,6 @@ import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
-import java.util.concurrent.TimeUnit;
 
 import org.apache.commons.dbcp2.BasicDataSource;
 import org.apache.commons.dbutils.QueryRunner;
@@ -19,8 +18,8 @@ import org.apache.commons.dbutils.handlers.MapListHandler;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import com.why.util.CollectionUtil;
-import com.why.util.Property;
+import com.why.ismart.framework.config.Property;
+import com.why.ismart.framework.util.CollectionUtil;
 
 public class JdbcHelper {
 
@@ -89,26 +88,6 @@ public class JdbcHelper {
         return result;
     }
     
-    /** 
-     * Don't need close Connection because QueryRunner close Internal<br>
-     * ThreadLocal hold Connection for per Thread and don't remove!?
-     */
-    private static Connection getConnection(){
-        Connection conn = THREAD_CONNECTION_MAP.get();
-        if(conn == null){
-            try {
-                conn = DATA_SOURCE.getConnection();
-            } catch (SQLException e) {
-                e.printStackTrace();
-                LOGGER.error("getConnection error", e);
-                throw new RuntimeException(e);
-            } finally {
-                THREAD_CONNECTION_MAP.set(conn);
-            }
-        }
-        return conn;
-    }
-    
     public static <T> boolean insertEntity(Map<String, Object> fieldMap, Class<T> entityClass){
         if(CollectionUtil.isEmpty(fieldMap)){
             LOGGER.error("insertEntity fieldMap is empty");
@@ -159,6 +138,25 @@ public class JdbcHelper {
     private static String getTable(Class<?> entityClass) {
         return entityClass.getSimpleName();
     }
+    
+    public static void executeSqlFile(String path) {
+        InputStream input = Thread.currentThread().getContextClassLoader().getResourceAsStream(path);
+        if(input == null){
+            throw new IllegalArgumentException("找不到sql文件："+path);
+        }
+        
+        BufferedReader reader = new BufferedReader(new InputStreamReader(input));
+        try {
+            String sql;
+            while((sql=reader.readLine()) != null){
+                executeUpdate(sql);
+            }
+        } catch (IOException e) {
+            e.printStackTrace();
+            LOGGER.error("executeSqlFile error", e);
+            throw new RuntimeException(e);
+        }
+    }
 
     public static int executeUpdate(String sql, Object... params){
         int rows;
@@ -172,20 +170,25 @@ public class JdbcHelper {
         }
         return rows;
     }
-
-    public static void executeSqlFile(String path) {
-        InputStream input = Thread.currentThread().getContextClassLoader().getResourceAsStream(path);
-        BufferedReader reader = new BufferedReader(new InputStreamReader(input));
-        try {
-            String sql;
-            while((sql=reader.readLine()) != null){
-                executeUpdate(sql);
+    
+    /** 
+     * Don't need close Connection because QueryRunner close Internal<br>
+     * ThreadLocal hold Connection for per Thread and don't remove!?
+     */
+    private static Connection getConnection(){
+        Connection conn = THREAD_CONNECTION_MAP.get();
+        if(conn == null){
+            try {
+                conn = DATA_SOURCE.getConnection();
+            } catch (SQLException e) {
+                e.printStackTrace();
+                LOGGER.error("getConnection error", e);
+                throw new RuntimeException(e);
+            } finally {
+                THREAD_CONNECTION_MAP.set(conn);
             }
-        } catch (IOException e) {
-            e.printStackTrace();
-            LOGGER.error("executeSqlFile error", e);
-            throw new RuntimeException(e);
         }
+        return conn;
     }
     
 }

@@ -6,7 +6,7 @@
     <artifactId>iSmart</artifactId>
     <version>0.0.1-SNAPSHOT</version>
     <packaging>war</packaging>
-    <name>web framework</name>
+    <name>iSmart web framework</name>
 
     <properties>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
@@ -18,7 +18,7 @@
             <groupId>javax.servlet</groupId>
             <artifactId>javax.servlet-api</artifactId>
             <version>3.1.0</version>
-            <scope>provided</scope>
+            <!-- <scope>provided</scope> -->
         </dependency>
         <!-- JSP -->
         <dependency>
@@ -35,14 +35,6 @@
             <scope>runtime</scope>
         </dependency>
         
-        <!-- JUnit -->
-        <dependency>
-            <groupId>junit</groupId>
-            <artifactId>junit</artifactId>
-            <version>4.11</version>
-            <scope>test</scope>
-        </dependency>
-        
         <!-- SLF4J -->
         <dependency>
             <groupId>org.slf4j</groupId>
@@ -57,18 +49,21 @@
             <version>5.1.33</version>
             <scope>runtime</scope>
         </dependency>
+        
         <!-- Jackson -->
         <dependency>
             <groupId>com.fasterxml.jackson.core</groupId>
             <artifactId>jackson-databind</artifactId>
             <version>2.5.2</version>
         </dependency>
+        
         <!-- CGLib -->
         <dependency>
             <groupId>cglib</groupId>
             <artifactId>cglib</artifactId>
             <version>2.2.2</version>
         </dependency>
+        
         <!-- Apache Commons Lang -->
         <dependency>
             <groupId>org.apache.commons</groupId>
@@ -93,6 +88,7 @@
             <artifactId>commons-dbcp2</artifactId>
             <version>2.0.1</version>
         </dependency>
+        
         <!-- Apache Commons FileUpload -->
         <dependency>
             <groupId>commons-fileupload</groupId>
@@ -105,12 +101,20 @@
             <artifactId>commons-codec</artifactId>
             <version>1.10</version>
         </dependency>
+        
+        <!-- JUnit -->
+        <dependency>
+            <groupId>junit</groupId>
+            <artifactId>junit</artifactId>
+            <version>4.11</version>
+            <!-- <scope>test</scope> -->
+        </dependency>
     </dependencies>
     
     <build>
         <pluginManagement>
             <plugins>
-                <!-- eclipse support -->
+                <!-- Eclipse -->
                 <plugin>
                     <artifactId>maven-eclipse-plugin</artifactId>
                     <version>2.6</version>
@@ -128,7 +132,7 @@
                         <encoding>UTF-8</encoding>
                     </configuration>
                 </plugin>
-                <!-- resources encode -->
+                <!-- Resource -->
                 <plugin>
                     <groupId>org.apache.maven.plugins</groupId>
                     <artifactId>maven-resources-plugin</artifactId>
@@ -137,7 +141,7 @@
                         <encoding>UTF-8</encoding>
                     </configuration>
                 </plugin>
-                <!-- Skip the test or not -->
+                <!-- Test -->
                 <plugin>
                     <groupId>org.apache.maven.plugins</groupId>
                     <artifactId>maven-surefire-plugin</artifactId>
