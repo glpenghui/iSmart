@@ -12,9 +12,10 @@ public class Ioc {
         for(Map.Entry<Class<?>, Object> entry:beanMap.entrySet()){
             Class<?> clazz = entry.getKey();
             Object instance = entry.getValue();
-            Field[] fields = clazz.getFields();
+            Field[] fields = clazz.getDeclaredFields();
             for(Field field:fields){
                 if(field.isAnnotationPresent(Inject.class)){
+                    System.out.println("Inject "+clazz.getName()+" "+field.getName());
                     ReflectUtil.setField(instance, field, BeanContext.getBean(field.getType()));
                 }
             }

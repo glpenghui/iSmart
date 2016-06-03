@@ -1,4 +1,4 @@
-package com.why.ismart.framework;
+package com.why.ismart.framework.mvc;
 
 import com.why.ismart.framework.ioc.BeanContext;
 import com.why.ismart.framework.ioc.ClassContext;
@@ -16,7 +16,7 @@ public class Loader {
             ControllerContext.class
         };
         for(Class<?> clazz:classes){
-            ClassUtil.localClass(clazz.getName());
+            ClassUtil.loadClass(clazz.getName());
         }
     }
     

@@ -22,8 +22,8 @@ public class ClassUtil {
         return Thread.currentThread().getContextClassLoader();
     }
     
-    public static Class<?> localClass(String className){
-        return loadClass(className, false);
+    public static Class<?> loadClass(String className){
+        return loadClass(className, true);
     }
     
     public static Class<?> loadClass(String className, boolean isInitialized){
@@ -40,7 +40,7 @@ public class ClassUtil {
     public static Set<Class<?>> loadClassSet(String packageName){
         Set<Class<?>> classSet = new HashSet<Class<?>>();
         try {
-            Enumeration<URL> urls = classLoader().getResources(packageName.replaceAll(".", "/"));
+            Enumeration<URL> urls = classLoader().getResources(packageName.replace(".", "/"));
             while(urls.hasMoreElements()){
                 URL url = urls.nextElement();
                 if(url == null){
@@ -64,7 +64,7 @@ public class ClassUtil {
                     while(jarEntries.hasMoreElements()){
                         JarEntry jarEntry = jarEntries.nextElement();
                         String jarEntryName = jarEntry.getName();
-                        if(jarEntryName.equals(".class")){
+                        if(jarEntryName.endsWith(".class")){
                             String className = jarEntryName.substring(0, jarEntryName.lastIndexOf(".")).replaceAll("/", ".");
                             doAddClass(classSet, className);
                         }
@@ -110,7 +110,7 @@ public class ClassUtil {
     }
 
     private static void doAddClass(Set<Class<?>> classSet, String className) {
-        Class<?> clazz = localClass(className);
+        Class<?> clazz = loadClass(className, false);
         classSet.add(clazz);
     }
     

@@ -1,5 +1,7 @@
 package com.why.ismart.framework.mvc;
 
+import javax.servlet.http.HttpServletRequest;
+
 import org.apache.commons.lang3.builder.EqualsBuilder;
 import org.apache.commons.lang3.builder.HashCodeBuilder;
 
@@ -11,6 +13,10 @@ public class Request {
     public Request(String method, String path) {
         this.method = method;
         this.path = path;
+    }
+    
+    public Request(HttpServletRequest req) {
+        this(req.getMethod().toLowerCase(), req.getPathInfo());
     }
 
     public String getMethod() {
@@ -29,6 +35,11 @@ public class Request {
     @Override
     public boolean equals(Object obj) {
         return EqualsBuilder.reflectionEquals(this, obj);
+    }
+
+    @Override
+    public String toString() {
+        return "Request [method=" + method + ", path=" + path + "]";
     }
     
 }

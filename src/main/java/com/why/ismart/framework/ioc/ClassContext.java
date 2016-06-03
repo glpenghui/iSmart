@@ -11,7 +11,7 @@ public class ClassContext {
 
     private static final Set<Class<?>> CLASS_SET;
     static{
-        String basePackage = Config.appBasePackage();
+        String basePackage = Config.getAppBasePackage();
         CLASS_SET = ClassUtil.loadClassSet(basePackage);
     }
     

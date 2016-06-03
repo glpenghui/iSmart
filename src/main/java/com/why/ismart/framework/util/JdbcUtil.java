@@ -1,4 +1,4 @@
-package com.why.repo;
+package com.why.ismart.framework.util;
 
 import java.io.BufferedReader;
 import java.io.IOException;
@@ -18,31 +18,28 @@ import org.apache.commons.dbutils.handlers.MapListHandler;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import com.why.ismart.framework.config.Property;
-import com.why.ismart.framework.util.CollectionUtil;
+import com.why.ismart.framework.config.Config;
 
-public class JdbcHelper {
+public class JdbcUtil {
 
-    private static final Logger LOGGER = LoggerFactory.getLogger(JdbcHelper.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(JdbcUtil.class);
     
     private static final BasicDataSource DATA_SOURCE;
     
     static{
-        Property property = new Property("jdbc.properties");
-        
         DATA_SOURCE = new BasicDataSource();
-        DATA_SOURCE.setDriverClassName(property.getStr("jdbc.driver"));
-        DATA_SOURCE.setUrl(property.getStr("jdbc.url"));
-        DATA_SOURCE.setUsername(property.getStr("jdbc.username"));
-        DATA_SOURCE.setPassword(property.getStr("jdbc.password"));
+        DATA_SOURCE.setDriverClassName(Config.getJdbcDriver());
+        DATA_SOURCE.setUrl(Config.getJdbcUrl());
+        DATA_SOURCE.setUsername(Config.getJdbcUserName());
+        DATA_SOURCE.setPassword(Config.getJdbcPassword());
         
-        DATA_SOURCE.setInitialSize(property.getInt("pool.initialSize"));
-        DATA_SOURCE.setMinIdle(property.getInt("pool.minIdle"));
-        DATA_SOURCE.setMaxTotal(property.getInt("pool.maxTotal"));
-        DATA_SOURCE.setMaxWaitMillis(property.getInt("pool.maxWaitMillis"));
-        DATA_SOURCE.setTestWhileIdle(property.getBool("pool.testWhileIdle"));
-        DATA_SOURCE.setValidationQuery(property.getStr("pool.validationQuery"));
-        DATA_SOURCE.setRemoveAbandonedOnBorrow(property.getBool("pool.removeAbandonedOnBorrow"));
+        DATA_SOURCE.setInitialSize(Config.getPoolInitialSize());
+        DATA_SOURCE.setMinIdle(Config.getPoolMinIdle());
+        DATA_SOURCE.setMaxTotal(Config.getPoolMaxTotal());
+        DATA_SOURCE.setMaxWaitMillis(Config.getPoolMaxWaitMillis());
+        DATA_SOURCE.setTestWhileIdle(Config.getPoolTestWhileIdle());
+        DATA_SOURCE.setValidationQuery(Config.getPoolValidationQuery());
+        DATA_SOURCE.setRemoveAbandonedOnBorrow(Config.getPoolRemoveAbandonedOnBorrow());
     }
     
     private static final QueryRunner QUERY_RUNNER = new QueryRunner();
@@ -141,10 +138,6 @@ public class JdbcHelper {
     
     public static void executeSqlFile(String path) {
         InputStream input = Thread.currentThread().getContextClassLoader().getResourceAsStream(path);
-        if(input == null){
-            throw new IllegalArgumentException("找不到sql文件："+path);
-        }
-        
         BufferedReader reader = new BufferedReader(new InputStreamReader(input));
         try {
             String sql;

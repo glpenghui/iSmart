@@ -26,7 +26,7 @@ public class ControllerContext {
                             String reqMethod = array[0];
                             String reqPath = array[1];
                             Request request = new Request(reqMethod, reqPath);
-                            Handler handler = new Handler(controller, method);
+                            Handler handler = new Handler(method);
                             ACTION_MAP.put(request,  handler);
                         }
                     }
@@ -35,8 +35,12 @@ public class ControllerContext {
         }
     }
     
-    public Handler getHandler(String reqMethod, String reqPath){
-        return ACTION_MAP.get(new Request(reqMethod, reqPath));
+    public static Handler getHandler(String reqMethod, String reqPath){
+        return getHandler(new Request(reqMethod, reqPath));
+    }
+    
+    public static Handler getHandler(Request request){
+        return ACTION_MAP.get(request);
     }
     
 }

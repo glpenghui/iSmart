@@ -15,4 +15,8 @@ public class StringUtil {
         return !isEmpty(str);
     }
     
+    public static String[] splitString(String str, String separator){
+        return StringUtils.splitByWholeSeparator(str, separator);
+    }
+    
 }
