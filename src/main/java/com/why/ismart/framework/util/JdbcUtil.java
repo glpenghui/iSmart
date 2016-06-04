@@ -25,7 +25,6 @@ public class JdbcUtil {
     private static final Logger LOGGER = LoggerFactory.getLogger(JdbcUtil.class);
     
     private static final BasicDataSource DATA_SOURCE;
-    
     static{
         DATA_SOURCE = new BasicDataSource();
         DATA_SOURCE.setDriverClassName(Config.getJdbcDriver());
@@ -42,47 +41,37 @@ public class JdbcUtil {
         DATA_SOURCE.setRemoveAbandonedOnBorrow(Config.getPoolRemoveAbandonedOnBorrow());
     }
     
+    private static final ThreadLocal<Connection> THREAD_CONNECTION_MAP = new ThreadLocal<Connection>();
     private static final QueryRunner QUERY_RUNNER = new QueryRunner();
     
-    private static final ThreadLocal<Connection> THREAD_CONNECTION_MAP = new ThreadLocal<Connection>();
-    
     public static <T> T queryEntity(String sql, Class<T> entityClass, Object... params){
-        T entity;
-        Connection conn = getConnection();
         try {
-            entity = QUERY_RUNNER.query(conn, sql, new BeanHandler<T>(entityClass), params);
+            return QUERY_RUNNER.query(getConnection(), sql, new BeanHandler<T>(entityClass), params);
         } catch (SQLException e) {
             e.printStackTrace();
             LOGGER.error("queryEntity error", e);
             throw new RuntimeException(e);
         }
-        return entity;
     }
     
     public static <T> List<T> queryEntityList(String sql, Class<T> entityClass, Object... params){
-        List<T> entityList;
-        Connection conn = getConnection();
         try {
-            entityList = QUERY_RUNNER.query(conn, sql, new BeanListHandler<T>(entityClass), params);
+            return QUERY_RUNNER.query(getConnection(), sql, new BeanListHandler<T>(entityClass), params);
         } catch (SQLException e) {
             e.printStackTrace();
             LOGGER.error("queryEntityList error", e);
             throw new RuntimeException(e);
         }
-        return entityList;
     }
     
     public static List<Map<String, Object>> executeQuery(String sql, Object... params){
-        List<Map<String, Object>> result;
-        Connection conn = getConnection();
         try {
-            result = QUERY_RUNNER.query(conn, sql, new MapListHandler(), params);
+            return QUERY_RUNNER.query(getConnection(), sql, new MapListHandler(), params);
         } catch (SQLException e) {
             e.printStackTrace();
             LOGGER.error("executeQuery error", e);
             throw new RuntimeException(e);
         }
-        return result;
     }
     
     public static <T> boolean insertEntity(Map<String, Object> fieldMap, Class<T> entityClass){
@@ -152,16 +141,13 @@ public class JdbcUtil {
     }
 
     public static int executeUpdate(String sql, Object... params){
-        int rows;
-        Connection conn = getConnection();
         try {
-            rows = QUERY_RUNNER.update(conn, sql, params);
+            return QUERY_RUNNER.update(getConnection(), sql, params);
         } catch (SQLException e) {
             e.printStackTrace();
             LOGGER.error("executeUpdate error", e);
             throw new RuntimeException(e);
         }
-        return rows;
     }
     
     /** 

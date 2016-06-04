@@ -58,19 +58,19 @@ public class DispatcherServlet extends HttpServlet{
         }
         Object controller = BeanContext.getBean(handler.getController());
         Method method = handler.getMethod();
-        Param param = new Param(parse(req));
-        Object result = ReflectUtil.invokeMethod(controller, method, param);
+        Map<String, Object> paramMap = parse(req);
+        Object result = ReflectUtil.invokeMethod(controller, method, new Param(paramMap));
         process(result, req, resp);
     }
     
     private Map<String, Object> parse(HttpServletRequest req){
         Map<String, Object> map = new HashMap<String, Object>();
-        collectFromParam(req, map);
-        collectFromBody(req, map);
+        parseParam(req, map);
+        parseBody(req, map);
         return map;
     }
     
-    private void collectFromParam(HttpServletRequest req, Map<String, Object> map){
+    private void parseParam(HttpServletRequest req, Map<String, Object> map){
         Enumeration<String> paramNames = req.getParameterNames();
         while(paramNames.hasMoreElements()){
             String paramName = paramNames.nextElement();
@@ -79,7 +79,7 @@ public class DispatcherServlet extends HttpServlet{
         }
     }
     
-    private void collectFromBody(HttpServletRequest req, Map<String, Object> map){
+    private void parseBody(HttpServletRequest req, Map<String, Object> map){
         String body = UrlCoderUtil.decodeURL(readBody(req));
         if(StringUtil.isNotEmpty(body)){
             String[] params = StringUtil.splitString(body, "&");
@@ -112,15 +112,15 @@ public class DispatcherServlet extends HttpServlet{
     
     private void process(Object result, HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException{
         if(result instanceof View){
-            respondJsp((View)result, req, resp);
+            processJsp((View)result, req, resp);
         }else if(result instanceof Data){
-            respondJson((Data)result, req, resp);
+            processJson((Data)result, req, resp);
         }else{
             System.out.println("Unknown result!");
         }
     }
     
-    private void respondJsp(View view, HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException{
+    private void processJsp(View view, HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException{
         String path = view.getPath();
         if(path.startsWith("/")){
             resp.sendRedirect(req.getContextPath()+path);
@@ -133,7 +133,7 @@ public class DispatcherServlet extends HttpServlet{
         }
     }
     
-    private void respondJson(Data data, HttpServletRequest req, HttpServletResponse resp) throws IOException{
+    private void processJson(Data data, HttpServletRequest req, HttpServletResponse resp) throws IOException{
         Object model = data.getModel();
         if(model != null){
             resp.setContentType("application/json");
