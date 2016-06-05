@@ -5,13 +5,20 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.Set;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
+import com.why.ismart.framework.aop.AopContext;
 import com.why.ismart.framework.ioc.ClassContext;
 import com.why.ismart.framework.util.ArrayUtil;
 
 public class ControllerContext {
 
+    private static final Logger LOGGER = LoggerFactory.getLogger(ControllerContext.class);
+    
     private static final Map<Request, Handler> ACTION_MAP;
     static{
+        LOGGER.info("ControllerContext static init...");
         ACTION_MAP = new HashMap<Request, Handler>();
         Set<Class<?>> controllers = ClassContext.getControllers();
         for(Class<?> controller:controllers){

@@ -4,12 +4,18 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.Set;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import com.why.ismart.framework.util.ReflectUtil;
 
 public class BeanContext {
 
+    private static final Logger LOGGER = LoggerFactory.getLogger(BeanContext.class);
+    
     private static final Map<Class<?>, Object> BEAN_MAP;
     static{
+        LOGGER.info("BeanContext static init...");
         BEAN_MAP = new HashMap<Class<?>, Object>();
         Set<Class<?>> beans = ClassContext.getBeans();
         for(Class<?> clazz:beans){
@@ -27,6 +33,15 @@ public class BeanContext {
             throw new RuntimeException("Bean class not found:"+clazz);
         }
         return (T)BEAN_MAP.get(clazz);
+    }
+    
+    public static void setBean(Class<?> clazz, Object object){
+        if(BEAN_MAP.containsKey(clazz)){
+            LOGGER.info("BeanContext contain ["+clazz.getName()+" = "
+                    +BEAN_MAP.get(clazz).getClass().getName()
+                    +"], set value="+object.getClass().getName());
+        }
+        BEAN_MAP.put(clazz, object);
     }
     
 }

@@ -22,6 +22,7 @@ import org.apache.commons.io.IOUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import com.why.ismart.framework.Loader;
 import com.why.ismart.framework.config.Config;
 import com.why.ismart.framework.ioc.BeanContext;
 import com.why.ismart.framework.util.ArrayUtil;

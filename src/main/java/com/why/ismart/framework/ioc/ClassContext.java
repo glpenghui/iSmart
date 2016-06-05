@@ -1,7 +1,11 @@
 package com.why.ismart.framework.ioc;
 
+import java.lang.annotation.Annotation;
 import java.util.HashSet;
 import java.util.Set;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import com.why.ismart.framework.config.Config;
 import com.why.ismart.framework.mvc.Controller;
@@ -9,37 +13,48 @@ import com.why.ismart.framework.util.ClassUtil;
 
 public class ClassContext {
 
+    private static final Logger LOGGER = LoggerFactory.getLogger(ClassContext.class);
+    
     private static final Set<Class<?>> CLASS_SET;
     static{
+        LOGGER.info("ClassContext static init...");
         String basePackage = Config.getAppBasePackage();
         CLASS_SET = ClassUtil.loadClassSet(basePackage);
     }
     
     public static Set<Class<?>> getServices(){
-        Set<Class<?>> classSet = new HashSet<Class<?>>();
-        for(Class<?> clazz:CLASS_SET){
-            if(clazz.isAnnotationPresent(Service.class)){
-                classSet.add(clazz);
-            }
-        }
-        return classSet;
+        return getClassesByAnnotation(Service.class);
     }
     
     public static Set<Class<?>> getControllers(){
-        Set<Class<?>> classSet = new HashSet<Class<?>>();
+        return getClassesByAnnotation(Controller.class);
+    }
+    
+    public static Set<Class<?>> getClassesByAnnotation(Class<? extends Annotation> annotation){
+        Set<Class<?>> classes = new HashSet<Class<?>>();
         for(Class<?> clazz:CLASS_SET){
-            if(clazz.isAnnotationPresent(Controller.class)){
-                classSet.add(clazz);
+            if(clazz.isAnnotationPresent(annotation)){
+                classes.add(clazz);
             }
         }
-        return classSet;
+        return classes;
     }
     
     public static Set<Class<?>> getBeans(){
-        Set<Class<?>> classSet = new HashSet<Class<?>>();
-        classSet.addAll(getServices());
-        classSet.addAll(getControllers());
-        return classSet;
+        Set<Class<?>> classSetes = new HashSet<Class<?>>();
+        classSetes.addAll(getServices());
+        classSetes.addAll(getControllers());
+        return classSetes;
+    }
+    
+    public static Set<Class<?>> getSubClasses(Class<?> superClass){
+        Set<Class<?>> classes = new HashSet<Class<?>>();
+        for(Class<?> clazz:CLASS_SET){
+            if(superClass.isAssignableFrom(clazz) && !superClass.equals(clazz)){
+                classes.add(clazz);
+            }
+        }
+        return classes;
     }
     
 }
