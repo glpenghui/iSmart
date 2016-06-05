@@ -26,7 +26,7 @@ public class ControllerContext {
                             String reqMethod = array[0];
                             String reqPath = array[1];
                             Request request = new Request(reqMethod, reqPath);
-                            Handler handler = new Handler(method);
+                            Handler handler = new Handler(controller, method);
                             ACTION_MAP.put(request,  handler);
                         }
                     }
