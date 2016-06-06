@@ -41,7 +41,7 @@ public class JdbcUtil {
         DATA_SOURCE.setRemoveAbandonedOnBorrow(Config.getPoolRemoveAbandonedOnBorrow());
     }
     
-    private static final ThreadLocal<Connection> THREAD_CONNECTION_MAP = new ThreadLocal<Connection>();
+    private static final ThreadLocal<Connection> THREAD_CONNECTION = new ThreadLocal<Connection>();
     private static final QueryRunner QUERY_RUNNER = new QueryRunner();
     
     public static <T> T queryEntity(String sql, Class<T> entityClass, Object... params){
@@ -51,6 +51,8 @@ public class JdbcUtil {
             e.printStackTrace();
             LOGGER.error("queryEntity error", e);
             throw new RuntimeException(e);
+        } finally {
+            releaseConnection();
         }
     }
     
@@ -61,6 +63,8 @@ public class JdbcUtil {
             e.printStackTrace();
             LOGGER.error("queryEntityList error", e);
             throw new RuntimeException(e);
+        } finally {
+            releaseConnection();
         }
     }
     
@@ -71,6 +75,8 @@ public class JdbcUtil {
             e.printStackTrace();
             LOGGER.error("executeQuery error", e);
             throw new RuntimeException(e);
+        } finally {
+            releaseConnection();
         }
     }
     
@@ -147,15 +153,16 @@ public class JdbcUtil {
             e.printStackTrace();
             LOGGER.error("executeUpdate error", e);
             throw new RuntimeException(e);
+        } finally {
+            releaseConnection();
         }
     }
     
-    /** 
-     * Don't need close Connection because QueryRunner close Internal<br>
-     * ThreadLocal hold Connection for per Thread and don't remove!?
+    /**
+     * actually, QueryRunner close the Connection internally
      */
     private static Connection getConnection(){
-        Connection conn = THREAD_CONNECTION_MAP.get();
+        Connection conn = THREAD_CONNECTION.get();
         if(conn == null){
             try {
                 conn = DATA_SOURCE.getConnection();
@@ -164,10 +171,30 @@ public class JdbcUtil {
                 LOGGER.error("getConnection error", e);
                 throw new RuntimeException(e);
             } finally {
-                THREAD_CONNECTION_MAP.set(conn);
+                THREAD_CONNECTION.set(conn);
             }
         }
         return conn;
+    }
+    
+    /**
+     * conn.close() it meant to put the Connection back to the pool, not really close it
+     */
+    private static void releaseConnection(){
+        Connection conn = THREAD_CONNECTION.get();
+        if(conn != null){
+            try {
+                if(!conn.isClosed()){
+                    conn.close();
+                }
+            } catch (SQLException e) {
+                e.printStackTrace();
+                LOGGER.error("releaseConnection error", e);
+                throw new RuntimeException(e);
+            } finally {
+                THREAD_CONNECTION.remove();
+            }
+        }
     }
     
 }

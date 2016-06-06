@@ -20,6 +20,7 @@ public class AspectProxy implements Proxy {
             result = proxyChain.doProxyChain();
         }
         end();
+        
         return result;
     }
     
@@ -27,6 +28,7 @@ public class AspectProxy implements Proxy {
         
     }
     
+    /** 是否进行切面代理拦截，返回true代表拦截并可在before和after做具体拦截逻辑 */
     public boolean intercept(Class<?> clazz, Method method, Object[] params) {
         return true;
     }

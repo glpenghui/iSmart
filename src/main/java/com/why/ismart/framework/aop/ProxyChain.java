@@ -30,7 +30,6 @@ public class ProxyChain {
         this.methodParams = methodParams;
         this.methodProxy = methodProxy;
         this.proxyList = proxyList;
-        this.proxyIndex = 0;
     }
     
     public Object doProxyChain(){
