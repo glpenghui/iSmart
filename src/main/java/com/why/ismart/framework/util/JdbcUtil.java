@@ -44,36 +44,6 @@ public class JdbcUtil {
     private static final ThreadLocal<Connection> THREAD_CONNECTION = new ThreadLocal<Connection>();
     private static final QueryRunner QUERY_RUNNER = new QueryRunner();
     
-    public static <T> T queryEntity(String sql, Class<T> entityClass, Object... params){
-        try {
-            return QUERY_RUNNER.query(getConnection(), sql, new BeanHandler<T>(entityClass), params);
-        } catch (SQLException e) {
-            e.printStackTrace();
-            LOGGER.error("queryEntity error", e);
-            throw new RuntimeException(e);
-        }
-    }
-    
-    public static <T> List<T> queryEntityList(String sql, Class<T> entityClass, Object... params){
-        try {
-            return QUERY_RUNNER.query(getConnection(), sql, new BeanListHandler<T>(entityClass), params);
-        } catch (SQLException e) {
-            e.printStackTrace();
-            LOGGER.error("queryEntityList error", e);
-            throw new RuntimeException(e);
-        }
-    }
-    
-    public static List<Map<String, Object>> executeQuery(String sql, Object... params){
-        try {
-            return QUERY_RUNNER.query(getConnection(), sql, new MapListHandler(), params);
-        } catch (SQLException e) {
-            e.printStackTrace();
-            LOGGER.error("executeQuery error", e);
-            throw new RuntimeException(e);
-        }
-    }
-    
     public static <T> boolean insertEntity(Map<String, Object> fieldMap, Class<T> entityClass){
         if(CollectionUtil.isEmpty(fieldMap)){
             LOGGER.error("insertEntity fieldMap is empty");
@@ -150,24 +120,34 @@ public class JdbcUtil {
         }
     }
     
-    /**
-     * actually, QueryRunner close the Connection internally
-     */
-    private static Connection getConnection(){
-        Connection conn = THREAD_CONNECTION.get();
-        if(conn == null){
-            try {
-                conn = DATA_SOURCE.getConnection();
-            } catch (SQLException e) {
-                e.printStackTrace();
-                LOGGER.error("getConnection error", e);
-                throw new RuntimeException(e);
-            } finally {
-                THREAD_CONNECTION.set(conn);
-            }
+    public static <T> T queryEntity(String sql, Class<T> entityClass, Object... params){
+        try {
+            return QUERY_RUNNER.query(getConnection(), sql, new BeanHandler<T>(entityClass), params);
+        } catch (SQLException e) {
+            e.printStackTrace();
+            LOGGER.error("queryEntity error", e);
+            throw new RuntimeException(e);
         }
-        AssertUtil.notNull(conn);
-        return conn;
+    }
+    
+    public static <T> List<T> queryEntityList(String sql, Class<T> entityClass, Object... params){
+        try {
+            return QUERY_RUNNER.query(getConnection(), sql, new BeanListHandler<T>(entityClass), params);
+        } catch (SQLException e) {
+            e.printStackTrace();
+            LOGGER.error("queryEntityList error", e);
+            throw new RuntimeException(e);
+        }
+    }
+    
+    public static List<Map<String, Object>> executeQuery(String sql, Object... params){
+        try {
+            return QUERY_RUNNER.query(getConnection(), sql, new MapListHandler(), params);
+        } catch (SQLException e) {
+            e.printStackTrace();
+            LOGGER.error("executeQuery error", e);
+            throw new RuntimeException(e);
+        }
     }
     
     public static void beginTransaction(){
@@ -201,6 +181,26 @@ public class JdbcUtil {
             LOGGER.error("rollbackTransaction error", e);
             throw new RuntimeException(e);
         }
+    }
+    
+    /**
+     * actually, QueryRunner close the Connection internally
+     */
+    private static Connection getConnection(){
+        Connection conn = THREAD_CONNECTION.get();
+        if(conn == null){
+            try {
+                conn = DATA_SOURCE.getConnection();
+            } catch (SQLException e) {
+                e.printStackTrace();
+                LOGGER.error("getConnection error", e);
+                throw new RuntimeException(e);
+            } finally {
+                THREAD_CONNECTION.set(conn);
+            }
+        }
+        AssertUtil.notNull(conn);
+        return conn;
     }
     
     /**

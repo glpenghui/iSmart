@@ -10,6 +10,10 @@ public class Param {
         this.map = map;
     }
     
+    public Map<String, Object> getMap() {
+        return map;
+    }
+
     public long getLong(String key) {
         return Long.parseLong(map.get(key).toString());
     }
