@@ -51,8 +51,6 @@ public class JdbcUtil {
             e.printStackTrace();
             LOGGER.error("queryEntity error", e);
             throw new RuntimeException(e);
-        } finally {
-            releaseConnection();
         }
     }
     
@@ -63,8 +61,6 @@ public class JdbcUtil {
             e.printStackTrace();
             LOGGER.error("queryEntityList error", e);
             throw new RuntimeException(e);
-        } finally {
-            releaseConnection();
         }
     }
     
@@ -75,8 +71,6 @@ public class JdbcUtil {
             e.printStackTrace();
             LOGGER.error("executeQuery error", e);
             throw new RuntimeException(e);
-        } finally {
-            releaseConnection();
         }
     }
     
@@ -153,8 +147,6 @@ public class JdbcUtil {
             e.printStackTrace();
             LOGGER.error("executeUpdate error", e);
             throw new RuntimeException(e);
-        } finally {
-            releaseConnection();
         }
     }
     
@@ -174,13 +166,47 @@ public class JdbcUtil {
                 THREAD_CONNECTION.set(conn);
             }
         }
+        AssertUtil.notNull(conn);
         return conn;
+    }
+    
+    public static void beginTransaction(){
+        Connection conn = getConnection();
+        try {
+            conn.setAutoCommit(false);
+        } catch (SQLException e) {
+            e.printStackTrace();
+            LOGGER.error("beginTransaction error", e);
+            throw new RuntimeException(e);
+        }
+    }
+    
+    public static void commitTransaction(){
+        Connection conn = getConnection();
+        try {
+            conn.commit();
+        } catch (SQLException e) {
+            e.printStackTrace();
+            LOGGER.error("commitTransaction error", e);
+            throw new RuntimeException(e);
+        }
+    }
+    
+    public static void rollbackTransaction(){
+        Connection conn = getConnection();
+        try {
+            conn.rollback();
+        } catch (SQLException e) {
+            e.printStackTrace();
+            LOGGER.error("rollbackTransaction error", e);
+            throw new RuntimeException(e);
+        }
     }
     
     /**
      * conn.close() it meant to put the Connection back to the pool, not really close it
      */
-    private static void releaseConnection(){
+    public static void releaseConnection(){
         Connection conn = THREAD_CONNECTION.get();
         if(conn != null){
             try {

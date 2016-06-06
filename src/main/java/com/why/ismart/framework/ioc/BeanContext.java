@@ -37,9 +37,8 @@ public class BeanContext {
     
     public static void setBean(Class<?> clazz, Object object){
         if(BEAN_MAP.containsKey(clazz)){
-            LOGGER.info("BeanContext contain ["+clazz.getName()+" = "
-                    +BEAN_MAP.get(clazz).getClass().getName()
-                    +"], set value="+object.getClass().getName());
+            LOGGER.info("BeanContext contains "+clazz.getSimpleName()
+                    +", setBean="+object.getClass().getSimpleName());
         }
         BEAN_MAP.put(clazz, object);
     }
