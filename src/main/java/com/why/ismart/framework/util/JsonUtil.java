@@ -13,6 +13,12 @@ import com.fasterxml.jackson.databind.JsonMappingException;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
+/**
+ * 封装了com.fasterxml.jackson包的Json工具
+ * 
+ * @author whg
+ * @date 2016年6月18日 下午4:03:41
+ */
 public class JsonUtil {
 	
 	private static ObjectMapper om = new ObjectMapper();

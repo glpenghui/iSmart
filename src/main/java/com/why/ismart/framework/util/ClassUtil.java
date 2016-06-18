@@ -14,6 +14,15 @@ import java.util.jar.JarFile;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+/**
+ * 类加载工具，可加载知道类名的类以及加载指定包名的类<br/>
+ * 加载初始化框架的Loader以及IoC功能中扫描所有类并过滤出注解类的ClassContext使用到
+ * 
+ * @author whg
+ * @date 2016年6月18日 下午4:07:07
+ * @see com.why.ismart.framework.ioc.ClassContext
+ * @see com.why.ismart.framework.Loader
+ */
 public class ClassUtil {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(ClassUtil.class);

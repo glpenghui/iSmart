@@ -20,6 +20,16 @@ import org.slf4j.LoggerFactory;
 
 import com.why.ismart.framework.config.Config;
 
+/**
+ * 数据库工具类
+ * <ul>
+ * <li>依赖org.apache.commons.dbcp2的BasicDataSource做数据库连接池化</li>
+ * <li>依赖org.apache.commons.dbutils包封装了一系列jdbc数据库操作</li>
+ * </ul>
+ * 
+ * @author whg
+ * @date 2016年6月18日 下午4:26:16
+ */
 public class JdbcUtil {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(JdbcUtil.class);

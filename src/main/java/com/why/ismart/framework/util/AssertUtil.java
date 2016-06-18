@@ -3,6 +3,12 @@ package com.why.ismart.framework.util;
 import java.util.Collection;
 import java.util.Map;
 
+/**
+ * 类似org.springframework.util的Assert断言类
+ * 
+ * @author whg
+ * @date 2016年6月18日 下午4:01:15
+ */
 public class AssertUtil {
 
     public static void isTrue(boolean expression) {

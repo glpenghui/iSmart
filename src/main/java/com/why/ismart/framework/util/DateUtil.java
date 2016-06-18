@@ -7,6 +7,12 @@ import java.util.Date;
 import org.apache.commons.lang3.time.DateFormatUtils;
 import org.apache.commons.lang3.time.DateUtils;
 
+/**
+ * 依赖org.apache.commons.lang3.time的DateFormatUtils和DateUtils
+ * 
+ * @author whg
+ * @date 2016年6月18日 下午4:02:49
+ */
 public class DateUtil {
     
     public static final String DAY = "yyyy-MM-dd";

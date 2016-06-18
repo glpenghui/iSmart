@@ -6,6 +6,12 @@ import java.util.Map;
 import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.collections4.MapUtils;
 
+/**
+ * 依赖org.apache.commons.collections4的CollectionUtils和MapUtils
+ * 
+ * @author whg
+ * @date 2016年6月18日 下午3:59:55
+ */
 public class CollectionUtil {
 
     public static boolean isEmpty(Collection<?> coll){

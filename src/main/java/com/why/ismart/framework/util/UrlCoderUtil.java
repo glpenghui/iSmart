@@ -7,6 +7,12 @@ import org.apache.commons.codec.digest.DigestUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+/**
+ * 对URLDecoder和URLEncoder以及org.apache.commons.codec.digest的DigestUtils封装
+ * 
+ * @author whg
+ * @date 2016年6月18日 下午4:18:21
+ */
 public class UrlCoderUtil {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(UrlCoderUtil.class);
@@ -29,9 +35,7 @@ public class UrlCoderUtil {
         }
     }
 
-    /**
-     * MD5 加密
-     */
+    /** MD5 加密 */
     public static String md5(String source) {
         return DigestUtils.md5Hex(source);
     }
